@@ -283,26 +283,29 @@ function App() {
   }
 
   const handleEditorChange = useCallback(async (editorObj, value) => {
-    console.log("e", value);
+
     updateEditorState(editorObj.id, {
       text: value,
       statsState: NETWORK_STATUS.pending
     });
     try {
       const res = await fetchStats(value);
+      if (!editors[editorObj.id]) return
       updateEditorState(editorObj.id, {
         statsRes: res.word_count,
         statsState: NETWORK_STATUS.success
       });
     } catch(e) {
+      if (!editors[editorObj.id]) return
       updateEditorState(editorObj.id, {
         statsRes: 'Network error',
         statsState: NETWORK_STATUS.error
       });
     }
-  }, []);
+  }, [editors]);
 
   const handleEditorRun = useCallback(async (editorObj) => {
+
     updateEditorState(editorObj.id, {
       runState: NETWORK_STATUS.pending
     });
@@ -310,11 +313,13 @@ function App() {
       if (editorObj.runState === NETWORK_STATUS.pending) return
       const res = await fetchRun(editorObj.text);
       console.log('res', res);
+      if (!editors[editorObj.id]) return
       updateEditorState(editorObj.id, {
         runRes: res.result,
         runState: NETWORK_STATUS.success
       });
     } catch(e) {
+      if (!editors[editorObj.id]) return
       updateEditorState(editorObj.id, {
         runRes: 'error',
         runState: NETWORK_STATUS.error
